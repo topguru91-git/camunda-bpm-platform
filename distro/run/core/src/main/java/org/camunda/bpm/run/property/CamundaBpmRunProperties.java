@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.run.property;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -26,13 +29,15 @@ public class CamundaBpmRunProperties {
   public static final String PREFIX = CamundaBpmProperties.PREFIX + ".run";
 
   @NestedConfigurationProperty
-  private CamundaBpmRunAuthenticationProperties auth = new CamundaBpmRunAuthenticationProperties();
+  protected CamundaBpmRunAuthenticationProperties auth = new CamundaBpmRunAuthenticationProperties();
 
   @NestedConfigurationProperty
-  private CamundaBpmRunCorsProperty cors = new CamundaBpmRunCorsProperty();
+  protected CamundaBpmRunCorsProperty cors = new CamundaBpmRunCorsProperty();
 
   @NestedConfigurationProperty
-  private CamundaBpmRunLdapProperties ldap = new CamundaBpmRunLdapProperties();
+  protected CamundaBpmRunLdapProperties ldap = new CamundaBpmRunLdapProperties();
+
+  protected Map<String, Map<String, Object>> plugins = new HashMap<>();
 
   public CamundaBpmRunAuthenticationProperties getAuth() {
     return auth;
@@ -58,8 +63,16 @@ public class CamundaBpmRunProperties {
     this.ldap = ldap;
   }
 
+  public Map<String, Map<String, Object>> getPlugins() {
+    return plugins;
+  }
+
+  public void setPlugins(Map<String, Map<String, Object>> plugins) {
+    this.plugins = plugins;
+  }
+
   @Override
   public String toString() {
-    return "CamundaBpmRunProperties [auth=" + auth + ", cors=" + cors + ", ldap=" + ldap + "]";
+    return "CamundaBpmRunProperties [auth=" + auth + ", cors=" + cors + ", ldap=" + ldap + ", plugins=" + plugins + "]";
   }
 }
