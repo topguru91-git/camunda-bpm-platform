@@ -3,6 +3,28 @@
 BASEDIR=$(dirname "$0")
 deploymentDir=$BASEDIR/configuration/resources
 
+# set environment parameters
+webappsPath=$BASEDIR/internal/webapps/
+restPath=$BASEDIR/internal/rest/
+swaggerPath=$BASEDIR/internal/swaggerui
+examplePath=$BASEDIR/internal/example
+classPath=$BASEDIR/configuration/userlib/,$BASEDIR/configuration/keystore/
+pidPath=$BASEDIR/internal/run.pid
+optionalComponentChosen=false
+restChosen=false
+swaggeruiChosen=false
+productionChosen=false
+configuration=$BASEDIR/configuration/default.yml
+
+# check if a Camunda Run instance is already in operation
+if [ -s "$pidPath" ]; then
+  echo "
+A Camunda Run instance is already in operation (process id $(cat $pidPath)).
+
+Please stop it or remove the file $pidPath."
+  exit 1
+fi
+
 # setup the JVM
 if [ "x$JAVA" = "x" ]; then
   if [ "x$JAVA_HOME" != "x" ]; then
@@ -19,22 +41,9 @@ if [ "x$JAVA_OPTS" != "x" ]; then
   echo JAVA_OPTS: $JAVA_OPTS
 fi
 
-# set environment parameters
-webappsPath=$BASEDIR/internal/webapps/
-restPath=$BASEDIR/internal/rest/
-swaggerPath=$BASEDIR/internal/swaggerui
-examplePath=$BASEDIR/internal/example
-classPath=$BASEDIR/configuration/userlib/,$BASEDIR/configuration/keystore/
-optionalComponentChosen=false
-restChosen=false
-swaggeruiChosen=false
-productionChosen=false
-configuration=$BASEDIR/configuration/default.yml
-
-
 # inspect arguments
 while [ "$1" != "" ]; do
-  case $1 in 
+  case $1 in
     --webapps )    optionalComponentChosen=true
                    classPath=$webappsPath,$classPath
                    echo WebApps enabled
@@ -84,4 +93,7 @@ fi
 echo classpath: $classPath
 
 # start the application
-"$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$deploymentDir" $JAVA_OPTS -jar "$BASEDIR/internal/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration"
+"$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$deploymentDir" $JAVA_OPTS -jar "$BASEDIR/internal/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration" &
+
+# store the process id
+echo $! > $pidPath

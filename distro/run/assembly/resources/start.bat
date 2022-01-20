@@ -37,6 +37,7 @@ SET restChosen=false
 SET swaggeruiChosen=false
 SET productionChosen=false
 SET configuration=%BASEDIR%configuration\default.yml
+SET appName="Camunda Run"
 
 
 REM inspect arguments
@@ -47,7 +48,7 @@ IF [%~1]==[--webapps] (
   SET optionalComponentChosen=true
   SET classPath=%webappsPath%,%classPath%
   ECHO WebApps enabled
-) 
+)
 
 IF [%~1]==[--rest] (
   SET optionalComponentChosen=true
@@ -105,4 +106,4 @@ IF [%swaggeruiChosen%]==[true] (
 ECHO classpath: %classPath%
 
 REM start the application
-call %JAVA% -Dloader.path="%classPath%" -Dcamunda.deploymentDir="%deploymentDir%" %JAVA_OPTS% -jar "%BASEDIR%internal\camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
+START %appName% %JAVA% -Dloader.path="%classPath%" -Dcamunda.deploymentDir="%deploymentDir%" %JAVA_OPTS% -jar "%BASEDIR%internal\camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
